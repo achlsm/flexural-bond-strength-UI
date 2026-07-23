@@ -167,39 +167,20 @@ def main():
 
     # ---------------- Tab prediksi ----------------
     with tab_predict:
-        col1, col2 = st.columns([1, 1])
+        st.subheader("Nilai input yang dipakai")
+        st.dataframe(feature_row, use_container_width=True, hide_index=True)
 
-        with col1:
-            st.subheader("Nilai input yang dipakai")
-            st.dataframe(feature_row, use_container_width=True, hide_index=True)
+        if st.button("🚀 Prediksi τmax", type="primary", use_container_width=True):
+            model = final_models[model_name]
+            pred = model.predict(feature_row)[0]
+            st.session_state["last_pred"] = pred
+            st.session_state["last_model"] = model_name
 
-            if st.button("🚀 Prediksi τmax", type="primary", use_container_width=True):
-                model = final_models[model_name]
-                pred = model.predict(feature_row)[0]
-                st.session_state["last_pred"] = pred
-                st.session_state["last_model"] = model_name
-
-            if "last_pred" in st.session_state:
-                st.metric(
-                    label=f"Prediksi τmax ({st.session_state['last_model']})",
-                    value=f"{st.session_state['last_pred']:.2f} MPa",
-                )
-
-        with col2:
-            st.subheader("Prediksi semua model (untuk pembanding)")
-            rows = []
-            for name, model in final_models.items():
-                p = model.predict(feature_row)[0]
-                rows.append({"Model": name, "Predicted τmax (MPa)": round(float(p), 2)})
-            comp_df = pd.DataFrame(rows)
-            st.dataframe(comp_df, use_container_width=True, hide_index=True)
-
-            fig, ax = plt.subplots(figsize=(5, 3.2))
-            ax.bar(comp_df["Model"], comp_df["Predicted τmax (MPa)"], color="#2E86AB")
-            ax.set_ylabel("τmax (MPa)")
-            plt.xticks(rotation=20, ha="right")
-            fig.tight_layout()
-            st.pyplot(fig)
+        if "last_pred" in st.session_state:
+            st.metric(
+                label=f"Prediksi τmax ({st.session_state['last_model']})",
+                value=f"{st.session_state['last_pred']:.2f} MPa",
+            )
 
     # ---------------- Tab metrik ----------------
     with tab_metrics:
@@ -251,6 +232,7 @@ def main():
         )
 
     st.markdown("---")
+    st.caption("Dibuat dengan Streamlit • Model & dataset diadaptasi dari repo GitHub AlirezaMahmoudian/flexural-bond-strength")
 
 
 if __name__ == "__main__":
