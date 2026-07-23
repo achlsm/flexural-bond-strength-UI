@@ -66,6 +66,17 @@ MODEL_BUILDERS = {
 @st.cache_data
 def load_data():
     df = pd.read_excel(DATA_PATH, sheet_name=0, header=0)
+
+    # Samakan nama 8 kolom fitur pertama dengan FEATURE_NAMES.
+    # Ini WAJIB: nama kolom Excel aslinya sedikit beda dari yang dipakai
+    # di kode (mis. "Bar size " ada trailing space, "Embedment lengths (mm)"
+    # pakai bentuk jamak). Kalau tidak disamakan, model akan di-fit() dengan
+    # nama kolom asli tapi predict() dipanggil dengan nama kolom dari
+    # FEATURE_NAMES -> scikit-learn menganggap nama fitur tidak cocok
+    # dan melempar ValueError seperti yang muncul di local & Streamlit Cloud.
+    rename_map = dict(zip(df.columns[0:8], FEATURE_NAMES))
+    df = df.rename(columns=rename_map)
+
     X = df.iloc[:, 0:8]
     y = df.iloc[:, 8].to_numpy().ravel()
     return df, X, y
@@ -240,7 +251,6 @@ def main():
         )
 
     st.markdown("---")
-    st.caption("Dibuat dengan Streamlit • Model & dataset diadaptasi dari repo GitHub AlirezaMahmoudian/flexural-bond-strength")
 
 
 if __name__ == "__main__":
