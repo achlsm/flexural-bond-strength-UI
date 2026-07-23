@@ -232,7 +232,6 @@ def main():
         )
 
     st.markdown("---")
-    st.caption("Dibuat dengan Streamlit • Model & dataset diadaptasi dari repo GitHub AlirezaMahmoudian/flexural-bond-strength")
 
 
 if __name__ == "__main__":
